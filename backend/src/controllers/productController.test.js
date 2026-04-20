@@ -1,10 +1,8 @@
 import request from 'supertest';
 import express from 'express';
+import { jest } from '@jest/globals';
 import { productController } from './productController.js';
-import { productService } from '../services/productService.js';
-
-// Mock the product service
-jest.mock('../services/productService.js');
+import * as productServiceModule from '../services/productService.js';
 
 const app = express();
 app.use(express.json());
@@ -19,7 +17,7 @@ describe('Product Controller - Cache-Control Headers', () => {
 
   test('GET /api/products should set Cache-Control header to public, max-age=60', async () => {
     // Mock the service response
-    productService.getAllProducts.mockResolvedValue({
+    productServiceModule.productService.getAllProducts = jest.fn().mockResolvedValue({
       products: [],
       total: 0,
       page: 1,
@@ -34,7 +32,7 @@ describe('Product Controller - Cache-Control Headers', () => {
 
   test('GET /api/products with filters should set Cache-Control header', async () => {
     // Mock the service response
-    productService.getAllProducts.mockResolvedValue({
+    productServiceModule.productService.getAllProducts = jest.fn().mockResolvedValue({
       products: [{ id: 1, name: 'Test Product' }],
       total: 1,
       page: 1,

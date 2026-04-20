@@ -1,10 +1,15 @@
 import request from 'supertest';
 import express from 'express';
+import { jest } from '@jest/globals';
 import { categoryController } from './categoryController.js';
-import { categoryService } from '../services/categoryService.js';
+import * as categoryServiceModule from '../services/categoryService.js';
 
 // Mock the category service
-jest.mock('../services/categoryService.js');
+jest.unstable_mockModule('../services/categoryService.js', () => ({
+  categoryService: {
+    getAllCategories: jest.fn(),
+  },
+}));
 
 const app = express();
 app.use(express.json());
@@ -19,7 +24,7 @@ describe('Category Controller - Cache-Control Headers', () => {
 
   test('GET /api/categories should set Cache-Control header to public, max-age=60', async () => {
     // Mock the service response
-    categoryService.getAllCategories.mockResolvedValue([
+    categoryServiceModule.categoryService.getAllCategories = jest.fn().mockResolvedValue([
       { id: 1, name: 'Bikes' },
       { id: 2, name: 'Accessories' }
     ]);
