@@ -2,13 +2,25 @@ import { useState, useEffect } from "react";
 import AdminNavbar from "../components/AdminNavbar";
 import { apiService } from "../services/api";
 import { Link } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     totalProducts: 0,
-    totalCategories: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    ordersToday: 0,
+    lowStockProducts: [],
+    ordersPerDay: [],
   });
-  const [recentProducts, setRecentProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,17 +29,8 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [productsRes, categoriesRes] = await Promise.all([
-        apiService.getProducts({ limit: 5 }),
-        apiService.getCategories(),
-      ]);
-
-      setStats({
-        totalProducts: productsRes.data.products?.length || 0,
-        totalCategories: categoriesRes.data.length,
-      });
-
-      setRecentProducts(productsRes.data.products || []);
+      const statsRes = await apiService.getAdminStats();
+      setStats(statsRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -43,7 +46,7 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -68,7 +71,7 @@ const AdminDashboard = () => {
                         Total Products
                       </dt>
                       <dd className="text-3xl font-semibold text-gray-900">
-                        {stats.totalProducts}
+                        {loading ? "..." : stats.totalProducts}
                       </dd>
                     </dl>
                   </div>
@@ -90,17 +93,17 @@ const AdminDashboard = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                       />
                     </svg>
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        Categories
+                        Total Orders
                       </dt>
                       <dd className="text-3xl font-semibold text-gray-900">
-                        {stats.totalCategories}
+                        {loading ? "..." : stats.totalOrders}
                       </dd>
                     </dl>
                   </div>
@@ -122,6 +125,38 @@ const AdminDashboard = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Total Revenue
+                      </dt>
+                      <dd className="text-3xl font-semibold text-gray-900">
+                        {loading ? "..." : `$${stats.totalRevenue.toFixed(2)}`}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                    <svg
+                      className="h-6 w-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
@@ -129,10 +164,10 @@ const AdminDashboard = () => {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        Status
+                        Orders Today
                       </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        All Systems Active
+                      <dd className="text-3xl font-semibold text-gray-900">
+                        {loading ? "..." : stats.ordersToday}
                       </dd>
                     </dl>
                   </div>
@@ -141,11 +176,46 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Recent Products */}
+          {/* Orders Per Day Chart */}
+          <div className="bg-white shadow rounded-lg mb-8">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Orders Per Day (Last 7 Days)
+              </h3>
+            </div>
+            <div className="px-4 py-5 sm:p-6">
+              {loading ? (
+                <p className="text-gray-500">Loading...</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stats.ordersPerDay}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(date) => {
+                        const d = new Date(date);
+                        return `${d.getMonth() + 1}/${d.getDate()}`;
+                      }}
+                    />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip
+                      labelFormatter={(date) => {
+                        const d = new Date(date);
+                        return d.toLocaleDateString();
+                      }}
+                    />
+                    <Bar dataKey="orders" fill="#4f46e5" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          {/* Low Stock Products */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Recent Products
+                Low Stock Products (Stock &lt; 5)
               </h3>
               <Link
                 to="/admin/products/new"
@@ -157,9 +227,9 @@ const AdminDashboard = () => {
             <div className="px-4 py-5 sm:p-6">
               {loading ? (
                 <p className="text-gray-500">Loading...</p>
-              ) : recentProducts.length === 0 ? (
+              ) : stats.lowStockProducts.length === 0 ? (
                 <p className="text-gray-500">
-                  No products yet. Add your first product!
+                  All products are well stocked!
                 </p>
               ) : (
                 <div className="overflow-x-auto">
@@ -170,55 +240,28 @@ const AdminDashboard = () => {
                           Product
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Price
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Stock
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Category
                         </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {recentProducts.map((product) => (
+                      {stats.lowStockProducts.map((product) => (
                         <tr key={product.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              {product.images?.[0] && (
-                                <img
-                                  className="h-10 w-10 rounded object-cover"
-                                  src={product.images[0]}
-                                  alt={product.title}
-                                />
-                              )}
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {product.title}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              ${product.price}
+                            <div className="text-sm font-medium text-gray-900">
+                              {product.title}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
                               className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                product.stock > 10
-                                  ? "bg-green-100 text-green-800"
-                                  : product.stock > 0
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-red-100 text-red-800"
+                                product.stock === 0
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
                               }`}
                             >
                               {product.stock} units
                             </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {product.category || "N/A"}
                           </td>
                         </tr>
                       ))}

@@ -106,7 +106,12 @@ export const orderService = {
   },
 
   async getAdminStats() {
-    const [productsRes, ordersRes, revenueRes, todayRes, lowStockRes] =
+    // Get date 7 days ago for orders per day chart
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split("T")[0];
+
+    const [productsRes, ordersRes, revenueRes, todayRes, lowStockRes, recentOrdersRes] =
       await Promise.all([
         supabase.from("products").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("orders").select("id", { count: "exact", head: true }),
@@ -120,6 +125,11 @@ export const orderService = {
           .select("id, title, stock")
           .lt("stock", 5)
           .eq("is_active", true),
+        supabase
+          .from("orders")
+          .select("created_at")
+          .gte("created_at", sevenDaysAgoStr)
+          .order("created_at", { ascending: true }),
       ]);
 
     const totalRevenue = (revenueRes.data || []).reduce(
@@ -127,12 +137,34 @@ export const orderService = {
       0
     );
 
+    // Group orders by day for the chart
+    const ordersPerDay = {};
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      const dateStr = date.toISOString().split("T")[0];
+      ordersPerDay[dateStr] = 0;
+    }
+
+    (recentOrdersRes.data || []).forEach((order) => {
+      const dateStr = order.created_at.split("T")[0];
+      if (ordersPerDay[dateStr] !== undefined) {
+        ordersPerDay[dateStr]++;
+      }
+    });
+
+    const ordersPerDayArray = Object.entries(ordersPerDay).map(([date, count]) => ({
+      date,
+      orders: count,
+    }));
+
     return {
       totalProducts: productsRes.count || 0,
       totalOrders: ordersRes.count || 0,
       totalRevenue,
       ordersToday: todayRes.count || 0,
       lowStockProducts: lowStockRes.data || [],
+      ordersPerDay: ordersPerDayArray,
     };
   },
 };
