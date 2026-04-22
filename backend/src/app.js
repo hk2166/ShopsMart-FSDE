@@ -11,6 +11,7 @@ import orderRoutes from "./routes/orders.js";
 import adminRoutes from "./routes/admin.js";
 import paymentRoutes from "./routes/payment.js";
 import customerRoutes from "./routes/customers.js";
+import couponRoutes from "./routes/coupons.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import logger from "./config/logger.js";
 
@@ -83,6 +84,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/customers", customerRoutes);
+app.use("/api/coupons", couponRoutes);
 
 // 404 handler
 app.use((req, res) => {
