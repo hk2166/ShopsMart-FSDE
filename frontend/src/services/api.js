@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL as DEFAULT_API_BASE_URL } from "../constants";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL;
 
 // Create axios instance
 const api = axios.create({
@@ -72,6 +73,11 @@ export const apiService = {
   // Coupons
   validateCoupon: (code, orderAmount) =>
     api.post("/coupons/validate", { code, order_amount: orderAmount }),
+  getAllCoupons: () => api.get("/coupons"),
+  getCouponById: (id) => api.get(`/coupons/${id}`),
+  createCoupon: (data) => api.post("/coupons", data),
+  updateCoupon: (id, data) => api.put(`/coupons/${id}`, data),
+  deleteCoupon: (id) => api.delete(`/coupons/${id}`),
 
   // Admin stats
   getAdminStats: () => api.get("/admin/stats"),

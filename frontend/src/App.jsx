@@ -7,7 +7,7 @@ import { AppProvider } from "./context/AppContext";
 import Layout from "./components/Layout";
 import HomeLuxury from "./pages/HomeLuxury";
 import Brands from "./pages/Brands";
-import BrandDetail from "./pages/BrandDetail";
+
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
@@ -19,6 +19,7 @@ import MyOrders from "./pages/MyOrders";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
+import AdminCoupons from "./pages/AdminCoupons";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -66,6 +67,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/admin/coupons"
+                  element={
+                    <ProtectedRoute>
+                      <AdminCoupons />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Customer Routes (With Layout) */}
                 <Route
@@ -75,7 +84,6 @@ function App() {
                       <Routes>
                         <Route path="/" element={<HomeLuxury />} />
                         <Route path="/brands" element={<Brands />} />
-                        <Route path="/brand/:id" element={<BrandDetail />} />
                         <Route path="/shop" element={<Shop />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/cart" element={<Cart />} />

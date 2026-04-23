@@ -52,7 +52,16 @@ const AdminNavbar = () => {
               >
                 Add Product
               </Link>
-              
+              <Link
+                to="/admin/coupons"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive("/admin/coupons")
+                    ? "bg-indigo-700"
+                    : "hover:bg-indigo-500"
+                }`}
+              >
+                Coupons
+              </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
