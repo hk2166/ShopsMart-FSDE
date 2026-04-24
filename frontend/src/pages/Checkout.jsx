@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { Lock, Truck, CreditCard, Tag } from "lucide-react";
 import { apiService } from "../services/api";
-
-const DELIVERY_FEE = 79;
+import { DELIVERY_FEE } from "../constants";
 
 const validate = (formData) => {
   const errors = {};

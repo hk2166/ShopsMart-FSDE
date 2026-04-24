@@ -4,20 +4,22 @@ import { Filter, X, ChevronDown, SlidersHorizontal } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { apiService } from "../services/api";
 import { useApp } from "../context/AppContext";
+import { DEFAULT_MAX_PRICE } from "../constants";
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
   const initialSearch = searchParams.get("q") || "";
+  const initialBrand = searchParams.get("brand") || "All";
   const { categories: cachedCategories } = useApp();
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedBrand, setSelectedBrand] = useState("All");
+  const [selectedBrand, setSelectedBrand] = useState(initialBrand);
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: DEFAULT_MAX_PRICE });
   const [searchQuery, setSearchQuery] = useState(initialSearch);
 
   // Build category name list from cached context
@@ -90,7 +92,7 @@ const Shop = () => {
   }, [selectedCategory, selectedBrand, products, sortBy, priceRange]);
 
   const maxPrice = useMemo(() => {
-    if (products.length === 0) return 100000;
+    if (products.length === 0) return DEFAULT_MAX_PRICE;
     return Math.max(...products.map((p) => p.price));
   }, [products]);
 

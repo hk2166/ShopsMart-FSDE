@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { apiService } from "../services/api";
 import { useApp } from "../context/AppContext";
+import { SPLASH_TIMEOUT, PRODUCTS_LIMIT_HOME } from "../constants";
 
 const HomeLuxury = () => {
   const { categories, categoriesLoading } = useApp();
@@ -26,10 +27,10 @@ const HomeLuxury = () => {
 
     window.addEventListener('scroll', handleScroll);
     
-    // Auto-hide splash after 3 seconds if user doesn't scroll
+    // Auto-hide splash after timeout if user doesn't scroll
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 3000);
+    }, SPLASH_TIMEOUT);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -39,7 +40,7 @@ const HomeLuxury = () => {
 
   const fetchData = async () => {
     try {
-      const productsRes = await apiService.getProducts({ limit: 12 });
+      const productsRes = await apiService.getProducts({ limit: PRODUCTS_LIMIT_HOME });
       setProducts(productsRes.data.products || []);
     } catch (error) {
       console.error("Error fetching data:", error);

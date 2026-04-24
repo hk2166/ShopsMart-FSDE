@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import { apiService } from "../services/api";
+import { DEFAULT_PAGE_SIZE, LOW_STOCK_THRESHOLD } from "../constants";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -10,7 +11,7 @@ const AdminProducts = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: DEFAULT_PAGE_SIZE,
     total: 0,
   });
 
@@ -21,9 +22,9 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await apiService.getProducts({ page, limit: 20 });
+      const response = await apiService.getProducts({ page, limit: DEFAULT_PAGE_SIZE });
       setProducts(response.data.products || []);
-      setPagination(response.data.pagination || { page: 1, limit: 20, total: 0 });
+      setPagination(response.data.pagination || { page: 1, limit: DEFAULT_PAGE_SIZE, total: 0 });
     } catch (error) {
       setError("Failed to load products");
       console.error("Error fetching products:", error);
@@ -140,7 +141,7 @@ const AdminProducts = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              product.stock > 10
+                              product.stock > LOW_STOCK_THRESHOLD
                                 ? "bg-green-100 text-green-800"
                                 : product.stock > 0
                                 ? "bg-yellow-100 text-yellow-800"
