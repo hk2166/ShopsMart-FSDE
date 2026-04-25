@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Plus, Trash2 } from "lucide-react";
 
 const emptyVariant = () => ({ size: "", color: "", sku: "", stock: "", price_modifier: "0" });
@@ -62,6 +63,19 @@ const VariantsEditor = ({ variants, onChange }) => {
       )}
     </div>
   );
+};
+
+VariantsEditor.propTypes = {
+  variants: PropTypes.arrayOf(
+    PropTypes.shape({
+      size: PropTypes.string,
+      color: PropTypes.string,
+      sku: PropTypes.string,
+      stock: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      price_modifier: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    })
+  ).isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default VariantsEditor;

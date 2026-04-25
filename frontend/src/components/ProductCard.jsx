@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { Heart, Sparkles } from "lucide-react";
 
@@ -93,6 +94,18 @@ const ProductCard = ({ product }) => {
       </div>
     </Link>
   );
+};
+
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    compare_price: PropTypes.number,
+    stock: PropTypes.number,
+    brand: PropTypes.string,
+    images: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
 };
 
 export default ProductCard;
