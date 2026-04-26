@@ -120,7 +120,7 @@ Tasks are ordered by priority. Each task is self-contained and can be worked on 
   - Add Previous / Next pagination controls at the bottom of the list
   - Show "Showing X–Y of Z products" count
 
-- [ ] 19. Add `Cache-Control` headers to GET product and category endpoints
+- [x] 19. Add `Cache-Control` headers to GET product and category endpoints
   - In `backend/src/controllers/productController.js` and `categoryController.js`, set `res.set('Cache-Control', 'public, max-age=60')` on list responses
   - This allows CDN/browser to cache responses for 60 seconds
 
@@ -128,18 +128,18 @@ Tasks are ordered by priority. Each task is self-contained and can be worked on 
 
 ## Phase 5 — Analytics & Operations
 
-- [ ] 20. Build real admin analytics dashboard
+- [x] 20. Build real admin analytics dashboard
   - Add `GET /api/admin/stats` backend endpoint returning: total products, total orders, total revenue, orders today, low-stock products (stock < 5)
   - Update `AdminDashboard.jsx` to fetch and display these stats
   - Add a simple bar chart for orders per day using `recharts`
 
-- [ ] 21. Build discount/coupon system
+- [x] 21. Build discount/coupon system
   - Create `coupons` table in Supabase (id, code, discount_type: flat|percent, discount_value, min_order, expiry_date, is_active)
   - Add `POST /api/coupons/validate` endpoint (public) that checks code validity and returns discount
   - Add coupon input field in `Checkout.jsx` that calls the validate endpoint and applies discount to total
   - Add coupon management page in admin (`/admin/coupons`)
 
-- [ ] 22. Complete or remove Brands pages
+- [x] 22. Complete or remove Brands pages
   - Decision: if brands are not a planned feature, remove `Brands` and `BrandDetail` routes from `App.jsx` and the Navbar link
   - If keeping: wire `Brands.jsx` to fetch unique brands from `GET /api/products?groupBy=brand` and display as cards; wire `BrandDetail.jsx` to filter products by brand
 
@@ -147,13 +147,13 @@ Tasks are ordered by priority. Each task is self-contained and can be worked on 
 
 ## Tech Debt
 
-- [ ] 23. Move magic numbers to a constants file
+- [x] 23. Move magic numbers to a constants file
   - Create `frontend/src/constants.js` with `DELIVERY_FEE`, `SPLASH_TIMEOUT`, `DEFAULT_PAGE_SIZE`, etc.
   - Replace all hardcoded values in components
 
-- [ ] 24. Add `PropTypes` to all components
+- [x] 24. Add `PropTypes` to all components
   - Add `PropTypes` validation to `ProductCard`, `BrandCard`, `Layout`, `ProtectedRoute`, and all page components that receive props
 
-- [ ] 25. Add a `frontend/.env.example` file
+- [x] 25. Add a `frontend/.env.example` file
   - Document all required frontend env variables with placeholder values
   - Ensure `.env` is in `.gitignore` (already is, but verify)
