@@ -91,6 +91,11 @@ app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+});
+
 // Error handler (must be last)
 app.use(errorHandler);
 
